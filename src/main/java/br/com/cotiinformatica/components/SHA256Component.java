@@ -4,6 +4,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class SHA256Component {
 	public String hash(String data) {
 		try {

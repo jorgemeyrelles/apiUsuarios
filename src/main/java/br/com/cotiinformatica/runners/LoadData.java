@@ -23,8 +23,8 @@ public class LoadData implements ApplicationRunner {
 		perfil_default.setNome("DEFAULT");
 		
 		Perfil perfil_admin = new Perfil();
-		perfil_default.setId(UUID.randomUUID());
-		perfil_default.setNome("ADMIN");
+		perfil_admin.setId(UUID.randomUUID());
+		perfil_admin.setNome("ADMIN");
 		
 		if (perfilRepository.findPerfilByNome("DEFAULT") == null) {
 			perfilRepository.save(perfil_default);

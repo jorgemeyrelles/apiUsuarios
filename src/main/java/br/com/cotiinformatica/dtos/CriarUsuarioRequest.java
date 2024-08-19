@@ -14,7 +14,7 @@ public class CriarUsuarioRequest {
 	@Email(message = "Informe um endereço de email válido.")
 	@NotEmpty(message = "Por favor, informe o e-mail do usuário.")
 	private String email;
-	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
+	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{8,}$",
 			message = "Informe a senha com letras minúsculas, maiúsculas, números, símbolos e pelo menos 8 caracteres.")
 	@NotEmpty(message = "Por favor, informe a senha do usuário.")
 	private String senha;
