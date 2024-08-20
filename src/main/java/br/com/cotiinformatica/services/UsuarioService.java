@@ -13,7 +13,9 @@ import br.com.cotiinformatica.dtos.AutenticarUsuarioRequest;
 import br.com.cotiinformatica.dtos.AutenticarUsuarioResponse;
 import br.com.cotiinformatica.dtos.CriarUsuarioRequest;
 import br.com.cotiinformatica.dtos.CriarUsuarioResponse;
+import br.com.cotiinformatica.dtos.ObterDadosUsuarioResponse;
 import br.com.cotiinformatica.entities.Usuario;
+import br.com.cotiinformatica.exceptions.AcessoNegadoException;
 import br.com.cotiinformatica.exceptions.EmailJaCadastradoException;
 import br.com.cotiinformatica.repositories.PerfilRepository;
 import br.com.cotiinformatica.repositories.UsuarioRepository;
@@ -57,7 +59,37 @@ public class UsuarioService {
 	}
 
 	public AutenticarUsuarioResponse autenticar(@RequestBody AutenticarUsuarioRequest request) throws Exception {
-		// TODO
-		return null;
+		Usuario usuario = usuarioRepository.findByEmailAndSenha(request.getEmail(),
+				sha256Component.hash(request.getSenha()));
+		if (usuario == null) {
+			throw new AcessoNegadoException();
+		}
+		
+		AutenticarUsuarioResponse response = new AutenticarUsuarioResponse();
+		response.setId(usuario.getId());
+		response.setDataHoraAcesso(new Date());
+		response.setEmail(usuario.getEmail());
+		response.setNome(usuario.getNome());
+		response.setNomePerfil(usuario.getPerfil().getNome());
+		response.setDataHoraExpiracao(null);
+		response.setTokenAcesso(null);
+		return response;
+	}
+
+	public ObterDadosUsuarioResponse obterDados(String token) throws Exception {
+		String email = jwtTokenComponent.getEmailFromToken(token); // e-mail no corpo do token
+		
+		Usuario usuario = usuarioRepository.findByEmail(email); // verificando se o e-mail está no DB
+		if (usuario == null) {
+			throw new AcessoNegadoException();
+		}
+		
+		ObterDadosUsuarioResponse response = new ObterDadosUsuarioResponse();
+		response.setId(usuario.getId());
+		response.setEmail(usuario.getEmail());
+		response.setNome(usuario.getNome());
+		response.setNomePerfil(usuario.getPerfil().getNome());
+		
+		return response;
 	}
 }

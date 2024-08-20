@@ -1,11 +1,13 @@
 package br.com.cotiinformatica.components;
 
 import java.util.Date;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import br.com.cotiinformatica.entities.Usuario;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -22,11 +24,17 @@ public class JwtTokenComponent {
 	}
 
 	public String generateToken(Usuario usuario) {
-		return Jwts.builder()
-				.setSubject(usuario.getEmail())
-				.setNotBefore(getExpirationDate())
-				.signWith(SignatureAlgorithm.HS256, secretKey)
-				.compact();
+		return Jwts.builder().setSubject(usuario.getEmail()).setNotBefore(getExpirationDate())
+				.signWith(SignatureAlgorithm.HS256, secretKey).compact();
+	}
+
+	public String getEmailFromToken(String token) {
+		return getSubject(token, Claims::getSubject);
+	}
+
+	private <T> T getSubject(String token, Function<Claims, T> claimsResolver) {
+		final Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+		return claimsResolver.apply(claims);
 	}
 
 }
