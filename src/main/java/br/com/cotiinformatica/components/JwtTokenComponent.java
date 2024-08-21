@@ -16,7 +16,7 @@ public class JwtTokenComponent {
 	@Value("${jwt.secretkey}")
 	private String secretKey;
 	@Value("${jwt.expiration}")
-	private String expiration;
+	private Integer expiration;
 
 	public Date getExpirationDate() {
 		Date dataAtual = new Date();
@@ -24,8 +24,12 @@ public class JwtTokenComponent {
 	}
 
 	public String generateToken(Usuario usuario) {
-		return Jwts.builder().setSubject(usuario.getEmail()).setNotBefore(getExpirationDate())
-				.signWith(SignatureAlgorithm.HS256, secretKey).compact();
+		return Jwts.builder()
+				.setSubject(usuario.getEmail())
+				.setNotBefore(new Date())
+				.setExpiration(getExpirationDate())
+				.signWith(SignatureAlgorithm.HS256, secretKey)
+				.compact();
 	}
 
 	public String getEmailFromToken(String token) {

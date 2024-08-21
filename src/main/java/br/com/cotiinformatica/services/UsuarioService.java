@@ -64,32 +64,32 @@ public class UsuarioService {
 		if (usuario == null) {
 			throw new AcessoNegadoException();
 		}
-		
+
 		AutenticarUsuarioResponse response = new AutenticarUsuarioResponse();
 		response.setId(usuario.getId());
 		response.setDataHoraAcesso(new Date());
 		response.setEmail(usuario.getEmail());
 		response.setNome(usuario.getNome());
 		response.setNomePerfil(usuario.getPerfil().getNome());
-		response.setDataHoraExpiracao(null);
-		response.setTokenAcesso(null);
+		response.setDataHoraExpiracao(jwtTokenComponent.getExpirationDate());
+		response.setTokenAcesso(jwtTokenComponent.generateToken(usuario));
 		return response;
 	}
 
 	public ObterDadosUsuarioResponse obterDados(String token) throws Exception {
 		String email = jwtTokenComponent.getEmailFromToken(token); // e-mail no corpo do token
-		
+
 		Usuario usuario = usuarioRepository.findByEmail(email); // verificando se o e-mail está no DB
 		if (usuario == null) {
 			throw new AcessoNegadoException();
 		}
-		
+
 		ObterDadosUsuarioResponse response = new ObterDadosUsuarioResponse();
 		response.setId(usuario.getId());
 		response.setEmail(usuario.getEmail());
 		response.setNome(usuario.getNome());
 		response.setNomePerfil(usuario.getPerfil().getNome());
-		
+
 		return response;
 	}
 }
