@@ -1,6 +1,7 @@
 package br.com.cotiinformatica.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +31,8 @@ public class UsuarioController {
 	public AutenticarUsuarioResponse autenticar(@RequestBody @Valid AutenticarUsuarioRequest request) throws Exception {
 		return usuarioService.autenticar(request);
 	}
-	@PostMapping("obter-dados")
+
+	@GetMapping("obter-dados")
 	public ObterDadosUsuarioResponse obterDados(HttpServletRequest request) throws Exception {
 		String token = request.getHeader("Authorization").replace("Bearer", "").trim();
 		return usuarioService.obterDados(token);
