@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import br.com.cotiinformatica.components.JwtTokenComponent;
+import br.com.cotiinformatica.components.RabbitMQProducerComponent;
 import br.com.cotiinformatica.components.SHA256Component;
 import br.com.cotiinformatica.dtos.AutenticarUsuarioRequest;
 import br.com.cotiinformatica.dtos.AutenticarUsuarioResponse;
 import br.com.cotiinformatica.dtos.CriarUsuarioRequest;
 import br.com.cotiinformatica.dtos.CriarUsuarioResponse;
+import br.com.cotiinformatica.dtos.MensagemUsuarioResponse;
 import br.com.cotiinformatica.dtos.ObterDadosUsuarioResponse;
 import br.com.cotiinformatica.entities.Usuario;
 import br.com.cotiinformatica.exceptions.AcessoNegadoException;
@@ -30,6 +32,8 @@ public class UsuarioService {
 	private SHA256Component sha256Component;
 	@Autowired
 	private JwtTokenComponent jwtTokenComponent;
+	@Autowired
+	private RabbitMQProducerComponent rabbitMQProducerComponent;
 
 	public CriarUsuarioResponse criar(CriarUsuarioRequest request) throws Exception {
 
@@ -47,6 +51,15 @@ public class UsuarioService {
 
 		// gravar o usuário no banco de dados
 		usuarioRepository.save(usuario);
+
+		// gravando mensagem
+		MensagemUsuarioResponse mensagem = new MensagemUsuarioResponse();
+		mensagem.setEmailDestinatario(usuario.getEmail());
+		mensagem.setAssunto("Confirmação de cadastro - COTI Informática");
+		mensagem.setTexto("Olá, " + usuario.getNome() + ". Parabéns, seu cadastro foi realizado com sucesso!");
+
+		// enviando a mensagem para a fila no rabbit
+		rabbitMQProducerComponent.send(mensagem);
 
 		// retornando os dados do usuário
 		CriarUsuarioResponse response = new CriarUsuarioResponse();
